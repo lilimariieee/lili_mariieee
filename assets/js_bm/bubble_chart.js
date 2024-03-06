@@ -162,9 +162,44 @@ var agecatCenters = { // Center locations of the bubbles.
     'mehr als 5h': 900
   };
     
-
-       
+// Fünfter Button: Sorgenbarmometer
     
+  var sorgenCenters = { // Center locations of the bubbles. 
+    '1': { x: 330, y: height / 1.9  },
+    '2': { x: 450, y: height / 1.9  },
+    '3': { x: 600, y: height / 2  },
+    '4': { x: 750, y: height / 2  }
+    
+  };
+
+  var sorgenTitleX = {  // X locations of the year titles.
+    'Stimmt ganz': 150,
+    'Stimmt eher': 350,
+    'Stimmt eher nicht': 680,
+    'Stimmt gar nicht': 900
+    
+  };
+       
+    // sechster Button: Brauchtinstageschlecht
+    
+  var instaCenters = { // Center locations of the bubbles. 
+    '4': { x: 200, y: height / 1.9  },
+    '3': { x: 330, y: height / 1.9  },
+    '2': { x: 450, y: height / 1.9  },
+    '1': { x: 600, y: height / 2  },
+    '0': { x: 750, y: height / 2  }
+    
+  };
+
+  var instaTitleX = {  // X locations of the year titles.
+    '4': 75,
+    '3': 235,
+    '2': 420,
+    '1': 670,
+    '0': 920    
+    
+  };
+       
 //* ------------------------------------------------------------------
 //
 // Teil 4 - Datenmanipulation (csv into JS)
@@ -230,8 +265,11 @@ var agecatCenters = { // Center locations of the bubbles.
           
         sex: d.geschlecht,
           
-       
+       sorgen:d.sorgenbarometerkat, //Sorgen import 1,2,3,4
+       sorgentext: d.sorgenbarometer, //Sorgen import Texte
         
+       insta: d.brauchtinstageschlecht,
+          
         x: Math.random() * 900,
         y: Math.random() * 800
       };
@@ -327,6 +365,11 @@ var agecatCenters = { // Center locations of the bubbles.
     hideAgecat();
     hideSex();
     hideScreentime();
+    hideSorgen();
+    hideInsta();
+      
+      
+    
 
     
     force.on('tick', function (e) {
@@ -369,6 +412,9 @@ Die Positionierung basiert auf dem alpha Parameter des force layouts und wird kl
     hideAgecat();
     hideSex();
     hideScreentime();
+    hideSorgen();
+    hideInsta();
+
 
 
     force.on('tick', function (e) {
@@ -417,6 +463,8 @@ function moveToYear(alpha) {
     hideYear();
     hideSex();
     hideScreentime();
+    hideSorgen();
+    hideInsta();
 
 
     force.on('tick', function (e) {
@@ -465,6 +513,8 @@ function moveToAgecat(alpha) {
     hideYear();
     hideAgecat();
     hideScreentime();
+    hideSorgen();
+    hideInsta();
 
 
     force.on('tick', function (e) {
@@ -513,6 +563,8 @@ function moveToAgecat(alpha) {
     hideYear();
     hideSex();
     hideAgecat();
+    hideSorgen();
+    hideInsta();
 
 
     force.on('tick', function (e) {
@@ -551,7 +603,107 @@ function moveToAgecat(alpha) {
     }    
 
   
+//* ------------------------------------------------------------------
+//
+// SORGEN / Sorgenbarmomenter
+//
+// -----------------------------------------------------------------*/
     
+  function splitBubblesintoSorgen() {
+    showSorgen();
+    hideYear();
+    hideSex();
+    hideAgecat();
+    hideScreentime();
+    hideInsta();
+
+
+    force.on('tick', function (e) {
+      bubbles.each(moveToSorgen(e.alpha))
+        .attr('cx', function (d) { return d.x; })
+        .attr('cy', function (d) { return d.y; });
+    });
+
+    force.start();
+  }
+
+  function moveToSorgen(alpha) {
+    return function (d) {
+      var target = sorgenCenters[d.sorgen];
+      d.x = d.x + (target.x - d.x) * damper * alpha * 1.1;
+      d.y = d.y + (target.y - d.y) * damper * alpha * 1.1;
+    };
+  }
+
+  function hideSorgen() {
+    svg.selectAll('.sorgen').remove();
+  }
+
+  function showSorgen() {
+
+    var sorgenData = d3.keys(sorgenTitleX);
+    var sorgen = svg.selectAll('.sorgen')
+      .data(sorgenData);
+
+    sorgen.enter().append('text')
+      .attr('class', 'sorgen')
+      .attr('x', function (d) { return sorgenTitleX[d]; })
+      .attr('y', 65)
+      .attr('text-anchor', 'middle')
+      .text(function (d) { return d; });
+    }    
+
+//* ------------------------------------------------------------------
+//
+// INSTA / Brauchtinstageschlecht
+//
+// -----------------------------------------------------------------*/
+    
+  function splitBubblesintoInsta() {
+    showInsta();
+    hideYear();
+    hideSex();
+    hideAgecat();
+    hideScreentime();
+    hideSorgen();
+    
+
+
+    force.on('tick', function (e) {
+      bubbles.each(moveToInsta(e.alpha))
+        .attr('cx', function (d) { return d.x; })
+        .attr('cy', function (d) { return d.y; });
+    });
+
+    force.start();
+  }
+
+  function moveToInsta(alpha) {
+    return function (d) {
+      var target = instaCenters[d.insta];
+      d.x = d.x + (target.x - d.x) * damper * alpha * 1.1;
+      d.y = d.y + (target.y - d.y) * damper * alpha * 1.1;
+    };
+  }
+
+  function hideInsta() {
+    svg.selectAll('.insta').remove();
+  }
+
+  function showInsta() {
+
+    var instaData = d3.keys(instaTitleX);
+    var insta = svg.selectAll('.insta')
+      .data(instaData);
+
+    insta.enter().append('text')
+      .attr('class', 'insta')
+      .attr('x', function (d) { return instaTitleX[d]; })
+      .attr('y', 65)
+      .attr('text-anchor', 'middle')
+      .text(function (d) { return d; });
+    }    
+
     
 //* ------------------------------------------------------------------
 //
@@ -578,6 +730,10 @@ function moveToAgecat(alpha) {
       splitBubblesintoSex();
     } else if (displayName === 'screentime') {
       splitBubblesintoScreentime();
+    } else if (displayName === 'sorgen') {
+      splitBubblesintoSorgen();
+    } else if (displayName === 'insta') {
+      splitBubblesintoInsta();
     } else {
       groupBubbles();
     }
@@ -624,6 +780,15 @@ function moveToAgecat(alpha) {
                   '<span class="name">Bildschirmzeit: </span><span class="value">' +
                   d.screentime +
                   '</span><br/>' +
+        
+                  '<span class="name">"Ich mache mir Sorgen um meine Daten": </span><span class="value">' +
+                  d.sorgentext +
+                  '</span><br/>' +
+        
+                  '<span class="name">"Braucht Instagram regelmässig": </span><span class="value">' +
+                  d.insta +
+                  '</span><br/>' +
+        
                   '<span class="name">"Umfragejahr": </span><span class="value">' +
                   d.year +
                   '</span>';
